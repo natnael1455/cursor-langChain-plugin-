@@ -1,0 +1,16 @@
+{
+  "name": "langchain-toolkit",
+  "displayName": "LangChain Toolkit",
+  "version": "0.1.0",
+  "description": "LangGraph CLI + LangSmith CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup.",
+  "author": "Natnael Yacob Asgedom",
+  "license": "MIT",
+  "keywords": [
+    "langchain",
+    "langgraph",
+    "langsmith",
+    "cli",
+    "agents",
+    "docs"
+  ]
+}
