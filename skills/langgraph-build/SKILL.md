@@ -6,6 +6,7 @@ description: >
   or "build a multi-arch langgraph image".
 metadata:
   version: "0.1.0"
+  description: "LangGraph CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup."
   cli: langgraph
   command: build
 ---
@@ -14,11 +15,9 @@ metadata:
 
 Build a Docker image of the user's LangGraph app for deployment.
 
-## Step 1 — Verify the LangGraph CLI is installed
+## Step 1 — Install-check (Branch B)
 
-See `skills/_shared/install-check.md`. Install command if missing:
-
-    pip install -U "langgraph-cli[inmem]"
+Follow **`skills/_shared/install-check.md`**, **Branch B**.
 
 ## Step 2 — Verify Docker buildx is available
 
@@ -38,12 +37,14 @@ If the user wants a multi-arch image for AMD64 + ARM64, use
 
 ## Step 4 — Run
 
+From **project root** (after Branch B **`install-check`**):
+
 ```bash
-langgraph build [resolved flags]
+uv run langgraph build [resolved flags]
 ```
 
 Report the resulting image ID and tag back to the user. Optionally suggest
 `docker push <tag>` if the user mentioned a registry.
 
-For deployment-target questions (LangSmith Deployment, K8s, etc.), defer to
+For deployment-target questions (hosted LangGraph, K8s, etc.), defer to
 `langchain-docs-search` or the `langgraph-deploy` skill.

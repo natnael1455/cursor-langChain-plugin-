@@ -2,18 +2,19 @@
 name: langchain-docs-search
 description: >
   This skill should be used when the user asks to "search the langchain docs",
-  "look up langgraph docs", "find langsmith documentation", "how does
-  <feature> work in langchain", or any time another skill in this plugin needs
-  authoritative reference material from docs.langchain.com.
+  "look up langgraph docs", "how does <feature> work in langchain",
+  or any time another skill in this plugin needs authoritative reference
+  material from docs.langchain.com.
 metadata:
   version: "0.1.0"
+  description: "LangGraph CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup."
   mcp_server: langchain-docs
 ---
 
 # langchain-docs-search
 
 Query the official **Docs by LangChain** MCP server for documentation snippets
-covering LangChain, LangGraph, and LangSmith.
+covering LangChain, LangGraph, and related ecosystem topics in Docs by LangChain.
 
 ## Step 1 — Verify the MCP server is connected
 

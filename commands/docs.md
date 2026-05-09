@@ -1,5 +1,5 @@
 ---
-description: Search the official LangChain/LangGraph/LangSmith docs via the langchain-docs MCP server.
+description: Search official LangChain and LangGraph documentation via the langchain-docs MCP server.
 argument-hint: <search query>
 ---
 

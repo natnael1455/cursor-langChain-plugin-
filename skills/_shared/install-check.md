@@ -1,47 +1,110 @@
 # Install-check protocol
 
-Every CLI-backed skill in this plugin **must** run this protocol before doing
-anything else. Reference it from `SKILL.md` and follow the steps verbatim.
+This protocol **implements Hard rule 1** of **`rules/langchain-toolkit-core.mdc`**
+(install-check before **`langgraph`**; ask before installing; never silently
+install; offer **`pip`**, **`uv tool install`**, or in-project
+**`langgraph-cli[inmem]`**).
 
-## Step 1 — Detect
+Every CLI-backed LangGraph skill **must** run the correct **branch** below before
+invoking **`langgraph`**. Reference this file from `SKILL.md` and follow the steps
+verbatim.
 
-Run a non-interactive check that exits 0 only if the CLI is on PATH:
+## Naming: detect vs install
 
-| CLI       | Detect command                              | Install command                         |
-| --------- | ------------------------------------------- | --------------------------------------- |
-| LangGraph | `command -v langgraph && langgraph --version` | `pip install -U "langgraph-cli[inmem]"` |
-| LangSmith | `command -v langsmith && langsmith --version` | `pip install -U langsmith-cli`          |
+- **PATH detection** uses only the **`langgraph`** executable:
+  **`command -v langgraph && langgraph --version`** (global) or
+  **`uv run langgraph --version`** (inside the project after sync). **Never**
+  probe **`langgraph-cli`** on PATH—that string names the PyPI distribution, not a
+  guaranteed binary ([LangGraph CLI](https://docs.langchain.com/langsmith/cli.md)).
+- **`langgraph-cli[inmem]`** is the package string for **`pip`**,
+  **`uv tool install`**, and **`pyproject.toml`** dev dependencies.
 
-Use the terminal tool to execute the detect command. Capture both stdout and
-the exit code.
+## Routing
 
-## Step 2 — Branch on result
+| Invoking skill | Branch |
+| -------------- | ------ |
+| **`langgraph-new`** | **Branch A** |
+| **`langgraph-dev`**, **`langgraph-up`**, **`langgraph-build`**, **`langgraph-deploy`**, **`langgraph-dockerfile`**, and other LangGraph CLI skills | **Branch B** |
 
-**If exit code is 0** (CLI present): record the version in your reasoning and
-proceed to the skill's main task.
+---
 
-**If exit code is non-zero** (CLI missing): do NOT silently install. Tell the
-user clearly and ask for confirmation:
+## Branch A — `langgraph-new` only
 
-> The `<cli>` CLI is not installed on this system. I can install it with:
->
->     <install command>
->
-> Should I run this now? (yes / no)
+Use before **`langgraph new`** when there may be **no** project yet.
 
-If the user confirms, run the install command. If they decline, stop the skill
-and let them know the task can't proceed without the CLI.
+1. **Detect `uv`:** `command -v uv` (record version).
+2. **Detect `langgraph`:** **`command -v langgraph && langgraph --version`**. Do
+   **not** use **`langgraph-cli`** on PATH.
+3. If **`uv`** or **`langgraph`** is missing: explain the gap, **ask for
+   confirmation**, then install — **never silently install**. For **`langgraph`**,
+   offer **`pip install -U "langgraph-cli[inmem]"`** or
+   **`uv tool install "langgraph-cli[inmem]"`** per the core rule. For **`uv`**,
+   install only after explicit user confirmation (installer or package manager per
+   user preference).
+4. After any install, **re-run** the detect commands from steps 1–2.
 
-## Step 3 — Re-verify after install
+---
 
-After running the install command, run the detect command again. If it still
-fails, surface the install output and stop — do not retry blindly.
+## Branch B — all other LangGraph CLI skills
+
+Use when operating against an existing LangGraph app layout.
+
+1. **Detect `uv`:** `command -v uv`. If missing: explain, **ask for
+   confirmation**, install **`uv`** only if confirmed — otherwise **stop**. Do
+   **not** silently install **`uv`**.
+2. **Project markers** at **project root** (directory containing
+   **`langgraph.json`**, or the parent directory of the file passed to **`-c`**
+   when the skill resolves a config path):
+   - Require **`pyproject.toml`** **and** **`langgraph.json`** both present.
+   - If **either** is missing: **stop**. Tell the user the layout is incomplete and
+     **hand off to the `langgraph-new` skill** — do **not** run **`langgraph`**
+     commands on Branch B.
+3. **Dev dependency and sync** (both markers present):
+   - Read **`pyproject.toml`** and locate dev dependencies, in order:
+     - PEP 735 **`[dependency-groups]`** → group **`dev`**,
+     - else **`[project.optional-dependencies]`** → extra **`dev`**,
+     - else legacy **`[tool.uv.dev-dependencies]`** if present.
+   - If **`langgraph-cli[inmem]`** is **not** listed in that dev surface: explain,
+     **ask for confirmation**, then edit **`pyproject.toml`** with a minimal diff —
+     **never** silently edit. Only after confirmation: add **`langgraph-cli[inmem]`**
+     to the correct section, then **`uv sync`**:
+     - **`uv sync --group dev`** when using **`[dependency-groups]`**,
+     - **`uv sync --extra dev`** when using **`optional-dependencies`**,
+     - **`uv sync`** when only **`tool.uv.dev-dependencies`** applies (typical
+       **`uv`** behavior).
+   - **Never** run **`uv sync`** after unsolicited **`pyproject.toml`** edits.
+   - Verify in the project env: **`uv run langgraph --version`** (recommended after
+     sync).
+4. Invoke **`langgraph`** only as **`uv run langgraph …`** from project root.
+
+---
+
+## Detect table (reference)
+
+| Tool | Detect command | Install (only after user confirms) |
+| ---- | -------------- | ----------------------------------- |
+| **`uv`** | `command -v uv && uv --version` | Per user preference after confirmation |
+| **`langgraph`** | `command -v langgraph && langgraph --version` | `pip install -U "langgraph-cli[inmem]"` or `uv tool install "langgraph-cli[inmem]"` |
+
+Use the terminal tool for detect commands. Capture stdout and exit code.
+
+If the user **declines** install or **`pyproject.toml`** edits, **stop** and explain
+that the task cannot proceed.
+
+After running an install command, **re-run** the relevant detect command. If it
+still fails, surface the install output and **stop** — do not retry blindly.
+
+---
 
 ## Implementation notes
 
-- Always prefer `pip install --user` if the user is on a system Python where
-  global writes might be denied.
-- On macOS where Homebrew Python is in use, `pip install --break-system-packages`
-  may be needed. Detect this only if the plain `pip install` fails with
-  `externally-managed-environment`.
-- Never invoke `sudo` automatically — surface the error and let the user decide.
+- Prefer **`uv sync`** + **`uv run …`** inside LangGraph projects instead of manual
+  venvs.
+- For global LangGraph installs when **`uv`** is available, prefer
+  **`uv tool install "langgraph-cli[inmem]"`** when the user agrees.
+- Prefer **`pip install --user`** on system Pythons where global writes may be
+  denied.
+- On macOS with Homebrew Python, **`pip install --break-system-packages`** may be
+  needed only if plain **`pip install`** fails with
+  **`externally-managed-environment`**.
+- Never invoke **`sudo`** automatically — surface the error and let the user decide.

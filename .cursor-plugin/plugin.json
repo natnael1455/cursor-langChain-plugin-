@@ -2,15 +2,26 @@
   "name": "langchain-toolkit",
   "displayName": "LangChain Toolkit",
   "version": "0.1.0",
-  "description": "LangGraph CLI + LangSmith CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup.",
-  "author": "Natnael Yacob Asgedom",
+  "description": "LangGraph CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup.",
+  "author": {
+    "name": "Natnael Yacob Asgedom"
+  },
   "license": "MIT",
   "keywords": [
     "langchain",
     "langgraph",
-    "langsmith",
     "cli",
     "agents",
     "docs"
+  ],
+  "category": "developer-tools",
+  "skills": "./skills/",
+  "mcpServers": "mcp.json",
+  "commands": [
+    "commands/lg-dev.md",
+    "commands/lg-up.md",
+    "commands/lg-build.md",
+    "commands/lg-deploy.md",
+    "commands/docs.md"
   ]
 }

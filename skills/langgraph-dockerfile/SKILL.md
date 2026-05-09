@@ -6,6 +6,7 @@ description: >
   graph", or wants to inspect/modify the base image LangGraph uses.
 metadata:
   version: "0.1.0"
+  description: "LangGraph CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup."
   cli: langgraph
   command: dockerfile
 ---
@@ -15,11 +16,9 @@ metadata:
 Generate a customizable Dockerfile for the user's LangGraph app, so they can
 add system packages, secrets handling, or other layers before building.
 
-## Step 1 — Verify the LangGraph CLI is installed
+## Step 1 — Install-check (Branch B)
 
-See `skills/_shared/install-check.md`. Install if needed:
-
-    pip install -U "langgraph-cli[inmem]"
+Follow **`skills/_shared/install-check.md`**, **Branch B**.
 
 ## Step 2 — Resolve target path (default: `Dockerfile`)
 
@@ -28,8 +27,11 @@ only if a `Dockerfile` already exists and would be overwritten.
 
 ## Step 3 — Run
 
+From **project root** (after Branch B **`install-check`**, including **`uv sync`** when
+needed):
+
 ```bash
-langgraph dockerfile <path> [-c langgraph.json]
+uv run langgraph dockerfile <path> [-c langgraph.json]
 ```
 
 ## Step 4 — Show the generated file
