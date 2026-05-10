@@ -18,29 +18,50 @@ add system packages, secrets handling, or other layers before building.
 
 ## Step 1 — Install-check (Branch B)
 
-Follow **`skills/_shared/install-check.md`**, **Branch B**.
+Follow **`skills/_shared/install-check.md`**, **Branch B**, and run that protocol
+**verbatim** before any **`langgraph`** command.
 
-## Step 2 — Resolve target path (default: `Dockerfile`)
+## Step 2 — Resolve flags and defaults
 
-If the user did not specify, default to `./Dockerfile` in the project root. Ask
-only if a `Dockerfile` already exists and would be overwritten.
+**Canonical source:** Run **`uv run langgraph dockerfile --help`** (or
+**`langgraph dockerfile --help`** when not using **`uv run`**) and treat that
+output as the source of truth for this installation: which flags exist, their
+defaults, and short descriptions.
 
-## Step 3 — Run
+1. Run **`--help`** from the same environment you will use for
+   **`langgraph dockerfile`** (project root, same **`uv`** / PATH).
+2. Parse **`--help`** to choose flags. If the user did not specify a flag, do not ask —
+   use the CLI defaults shown there. Only ask if they explicitly request customization.
 
-From **project root** (after Branch B **`install-check`**, including **`uv sync`** when
-needed):
+**If `--help` fails** (CLI missing, bad PATH, **`uv run`** errors, or the command exits
+non-zero): fall back to **LangChain documentation** via the MCP server
+**`plugin-langchain-toolkit-langchain-docs`**. If tool names are unclear, inspect that
+server’s tool descriptor JSON under the project **`mcps/plugin-langchain-toolkit-langchain-docs`**
+folder, then search the docs for **LangGraph CLI** and **`langgraph dockerfile`** (match Python vs
+JavaScript docs to the user’s project when relevant).
+
+**Docs vs installed CLI:** hosted docs may lag the installed **`langgraph`** version. When
+**`--help` works**, prefer it over documentation for flags and defaults.
+
+## Step 3 — Resolve Dockerfile path
+
+If the user did not specify, default to **`./Dockerfile`** in the project root.
+Ask only if a `Dockerfile` (or chosen path) already exists and would be overwritten.
+
+## Step 4 — Run (create file)
+
+From **project root**, run the CLI so the Dockerfile **exists on disk** :
 
 ```bash
-uv run langgraph dockerfile <path> [-c langgraph.json]
+uv run langgraph dockerfile [resolved flags]
 ```
 
-## Step 4 — Show the generated file
 
-Use `Read` to display the new Dockerfile. Highlight where the user can safely
-add custom `RUN` layers (typically before the final `CMD`).
 
-## Step 5 — Suggest next step
+## Step 5 — Show the generated file and suggest next step
 
-Recommend `langgraph-build` to build from the customized Dockerfile. For
-questions about supported Python versions or base images, use
-`langchain-docs-search`.
+Use **`Read`** to display the final Dockerfile after any Step 5 edits. Highlight where the
+user can safely add custom **`RUN`** layers (typically before the final **`CMD`**).
+
+
+about supported Python versions or base images, use **`langchain-docs-search`**.
