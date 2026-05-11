@@ -34,10 +34,8 @@ defaults, and short descriptions.
    use the CLI defaults shown there. Only ask if they explicitly request customization.
 
 **If `--help` fails** (CLI missing, bad PATH, **`uv run`** errors, or the command exits
-non-zero): fall back to **LangChain documentation** via the MCP server
-**`plugin-langchain-toolkit-langchain-docs`**. If tool names are unclear, inspect that
-server’s tool descriptor JSON under the project **`mcps/plugin-langchain-toolkit-langchain-docs`**
-folder, then search the docs for **LangGraph CLI** and **`langgraph dockerfile`** (match Python vs
+non-zero): follow **`skills/langchain-docs-search/SKILL.md`** to query **Docs by LangChain**
+for **LangGraph CLI** and **`langgraph dockerfile`** (match Python vs
 JavaScript docs to the user’s project when relevant).
 
 **Docs vs installed CLI:** hosted docs may lag the installed **`langgraph`** version. When
@@ -60,8 +58,7 @@ uv run langgraph dockerfile [resolved flags]
 
 ## Step 5 — Show the generated file and suggest next step
 
-Use **`Read`** to display the final Dockerfile after any Step 5 edits. Highlight where the
-user can safely add custom **`RUN`** layers (typically before the final **`CMD`**).
+Use **`Read`** to display the final Dockerfile after generation (and after any edits you make).
+Highlight where the user can safely add custom **`RUN`** layers (typically before the final **`CMD`**).
 
-
-about supported Python versions or base images, use **`langchain-docs-search`**.
+For questions about supported Python versions or base images, follow **`skills/langchain-docs-search/SKILL.md`**.

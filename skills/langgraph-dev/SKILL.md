@@ -46,10 +46,8 @@ LangSmith Studio: Studio uses **[Open LangGraph Studio (default: OS browser)](#o
 below unless the user explicitly wants otherwise.
 
 **If `--help` fails** (CLI missing, bad PATH, **`uv run`** errors, or the command exits
-non-zero): fall back to **LangChain documentation** via the MCP server
-**`plugin-langchain-toolkit-langchain-docs`**. If tool names are unclear, inspect that
-server’s tool descriptor JSON under the project **`mcps/plugin-langchain-toolkit-langchain-docs`**
-folder, then search the docs for **LangGraph CLI** and **`langgraph dev`** (match Python vs
+non-zero): follow **`skills/langchain-docs-search/SKILL.md`** to query **Docs by LangChain**
+for **LangGraph CLI** and **`langgraph dev`** (match Python vs
 JavaScript docs to the user’s project when relevant).
 
 **Docs vs installed CLI:** hosted docs may lag the installed **`langgraph`** version. When
@@ -140,5 +138,5 @@ Then [**open Studio in the default OS browser**](#open-langgraph-studio-default-
 - **Port already in use** → suggest `--port 2025` (or next free port).
 - **Instant Shell exit (~100 ms), unknown exit code, no startup banner** → almost always **runner/PTY teardown**. Retry **Integrated Terminal** or **`nohup` + `.cursor/langgraph-dev.log`** (Step 3) before debugging LangGraph or the project graph.
 
-For deeper questions about graph definitions, streaming, checkpoints, etc., use
-the `langchain-docs-search` skill to query the Docs by LangChain MCP.
+For deeper questions about graph definitions, streaming, checkpoints, etc., follow
+**`skills/langchain-docs-search/SKILL.md`**.

@@ -69,4 +69,4 @@ After scaffolding and **`uv sync`** (or equivalent):
 3. If `.env` was created from `.env.example`, remind the user to edit `.env` with real values; mention any API keys and tracing-related variables the template documents.
 4. Use the **`langgraph-dev`** skill to start the dev server (it will use **`uv run langgraph dev`** when applicable).
 
-For template-specific design questions, defer to `langchain-docs-search`.
+For template-specific design questions, defer to **`skills/langchain-docs-search/SKILL.md`**.
