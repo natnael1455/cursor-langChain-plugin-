@@ -1,77 +1,97 @@
-# langchain-toolkit (Cursor plugin)
+# langchain-python-devkit (Cursor plugin)
 
-Cursor plugin that wraps the **LangGraph** and **LangSmith** CLIs as on-demand
-skills, ships an always-on **rule** that injects the install-check protocol
-into Composer/Agent context, and registers the official **Docs by LangChain**
-MCP server for documentation lookup.
+Python-first Cursor plugin: wraps the **LangGraph** Python CLI as on-demand skills, ships an
+always-on **rule** that injects the install-check protocol into Composer/Agent
+context, and registers the official **Docs by LangChain** MCP server for
+documentation lookup.
 
 ## What's inside
 
 ```
 cursor-plugin/
-├── .cursor-plugin/plugin.json        # plugin manifest
+├── .cursor-plugin/plugin.json        # plugin manifest (+ logo path)
+├── assets/
+│   └── logo.svg                       # Marketplace / UI logo
 ├── mcp.json                          # langchain-docs MCP server
 ├── rules/
-│   └── langchain-toolkit-core.mdc    # always-applied install-check & routing rule
+│   └── langchain-toolkit-core.mdc    # always-applied install-check & routing
 ├── skills/
-│   ├── _shared/install-check.md      # shared install-check protocol
+│   ├── _shared/install-check.md      # shared install-check protocol (Branches A/B)
 │   ├── langgraph-{dev,up,build,dockerfile,new,deploy}/SKILL.md
-│   ├── langsmith-{projects,traces,runs,datasets,experiments,evaluators,threads}/SKILL.md
 │   └── langchain-docs-search/SKILL.md
 ├── commands/
-│   ├── lg-dev.md                     # /lg-dev   shortcut for langgraph-dev
-│   ├── lg-up.md                      # /lg-up
-│   ├── lg-build.md                   # /lg-build
-│   ├── lg-deploy.md                  # /lg-deploy
-│   ├── ls-traces.md                  # /ls-traces
-│   ├── ls-runs.md                    # /ls-runs
-│   └── docs.md                       # /docs   → langchain-docs-search
+│   ├── langchain-docs-search-cmd.md  # /langchain-docs-search-cmd
+│   ├── langgraph-build-cmd.md        # /langgraph-build-cmd
+│   ├── langgraph-deploy-cmd.md       # /langgraph-deploy-cmd
+│   ├── langgraph-dev-cmd.md          # /langgraph-dev-cmd
+│   ├── langgraph-dockerfile-cmd.md   # /langgraph-dockerfile-cmd
+│   ├── langgraph-new-cmd.md          # /langgraph-new-cmd
+│   └── langgraph-up-cmd.md           # /langgraph-up-cmd
 └── README.md
 ```
 
+Each **`…-cmd.md`** file invokes the paired skill (**`commands/<skill-name>-cmd.md`** → **`skills/<skill-name>/SKILL.md`**).
+
 ## Components
 
-- **MCP server** — `langchain-docs` (HTTP, `https://docs.langchain.com/mcp`).
-- **Always-on rule** — `rules/langchain-toolkit-core.mdc` keeps the
-  install-check protocol in Composer's persistent context so it's enforced
-  even when a skill isn't explicitly invoked.
-- **Skills** — 14 SKILL.md files covering every LangGraph and LangSmith CLI
-  command group, plus the docs search skill.
-- **Slash commands** — short aliases for the most common skills.
+- **MCP server** — **`langchain-docs`** (HTTP, `https://docs.langchain.com/mcp`), wired via `mcp.json`.
+- **Always-on rule** — `rules/langchain-toolkit-core.mdc` keeps the install-check
+  protocol in Composer’s persistent context so it is enforced even when a skill is
+  not explicitly invoked.
+- **Skills** — LangGraph-focused `SKILL.md` files plus **`langchain-docs-search`**. Highlights:
+  - **`langgraph-dev`** — **`langgraph dev`** with **`--help`**-driven flags and Branch B **`uv run`**.
+  - **`langgraph-dockerfile`** — **`langgraph dockerfile`**, **`--help`**-driven flags, then a **mandatory post-create edit** of the generated Dockerfile when it lives under a subdirectory: rewrite local-package **`ADD`** sources to a **POSIX relpath** from the Dockerfile’s directory to the **`langgraph.json`** project root, and fix **JSON-array `ADD` / quoted `WORKDIR`** when **`/deps/...`** paths contain spaces.
+  - **`langgraph-new`** — Branch **A** install-check (before **`langgraph new`**).
+- **Slash commands** — One per skill: **`/<skill-name>-cmd`** maps to **`commands/<skill-name>-cmd.md`** (see table below).
 
 ## Install-check contract
 
-Every CLI-backed skill begins with the install-check protocol from
-`skills/_shared/install-check.md`:
+Every LangGraph CLI skill starts from **`skills/_shared/install-check.md`**:
 
-1. Detect whether `langgraph` / `langsmith` is on PATH.
-2. If missing, surface the exact `pip install` command and confirm with the
-   user before running it.
-3. Only proceed once the CLI is verified.
+- **`langgraph-new`** → **Branch A** (global **`uv`** + **`langgraph`** before scaffold).
+- All other LangGraph CLI skills → **Branch B** (both **`pyproject.toml`** and
+  **`langgraph.json`**; dev **`langgraph-cli[inmem]`** + **`uv sync`** as specified;
+  then **`uv run langgraph …`**).
+
+Detect **`langgraph`** with **`command -v langgraph && langgraph --version`** (never
+probe **`langgraph-cli`** on PATH). Offer **pip** / **`uv tool install`** / in-project
+deps per that file — **ask before installing** (matches **`rules/langchain-toolkit-core.mdc`**).
 
 ## Setup
 
-1. **Install in Cursor** — copy this folder into your `~/.cursor/plugins/` or
-   submit it through the Cursor Marketplace. See
-   [Cursor docs → plugins](https://cursor.com/docs/reference/plugins).
-2. The `langchain-docs` MCP server is registered automatically via
-   `mcp.json`. After install, open Cursor → Settings → MCP and verify it shows
-   green.
-3. Set `LANGSMITH_API_KEY` in your shell environment for any LangSmith skill.
-4. For `langgraph deploy`, ensure your LangSmith workspace has Deployments
-   enabled.
+1. **Install in Cursor** — Install from the Marketplace, or copy this tree into a folder under
+   **`~/.cursor/plugins/`** (for example **`~/.cursor/plugins/local/langchain-python-devkit`** for a
+   local checkout). See [Cursor docs → plugins](https://cursor.com/docs/reference/plugins).
+2. **`langchain-docs`** is registered via **`mcp.json`**. After install, open Cursor →
+   Settings → MCP and confirm the server is healthy.
+3. For **`langgraph up`**, **`langgraph deploy`**, and tracing-heavy flows, set
+   **`LANGSMITH_API_KEY`** (and **`LANGSMITH_ENDPOINT`** if your workspace needs it)
+   as required by your project and the CLI.
+
+### Local development
+
+To iterate from a git clone, copy or sync the plugin directory into
+**`~/.cursor/plugins/local/langchain-python-devkit`**, then reload Cursor. Example:
+
+```bash
+rsync -av --exclude '.git' --exclude '.gitignore' ./cursor-plugin/ ~/.cursor/plugins/local/langchain-python-devkit/
+```
+
+(Adjust the source path to your clone.)
 
 ## Usage
 
-Either invoke skills naturally in Composer ("spin up langgraph dev",
-"list recent traces") or use the slash commands:
+Either invoke skills in Composer ("spin up langgraph dev", "generate a langgraph Dockerfile")
+or use the slash commands below.
 
-| Command       | Skill                  |
-| ------------- | ---------------------- |
-| `/lg-dev`     | `langgraph-dev`        |
-| `/lg-up`      | `langgraph-up`         |
-| `/lg-build`   | `langgraph-build`      |
-| `/lg-deploy`  | `langgraph-deploy`     |
-| `/ls-traces`  | `langsmith-traces`     |
-| `/ls-runs`    | `langsmith-runs`       |
-| `/docs`       | `langchain-docs-search`|
+| Command                      | Skill                    |
+| ---------------------------- | ------------------------ |
+| `/langchain-docs-search-cmd` | `langchain-docs-search`  |
+| `/langgraph-build-cmd`       | `langgraph-build`       |
+| `/langgraph-deploy-cmd`      | `langgraph-deploy`       |
+| `/langgraph-dev-cmd`         | `langgraph-dev`          |
+| `/langgraph-dockerfile-cmd`  | `langgraph-dockerfile`  |
+| `/langgraph-new-cmd`         | `langgraph-new`          |
+| `/langgraph-up-cmd`          | `langgraph-up`           |
+
+Skills are defined in **`skills/*/SKILL.md`**; slash commands delegate to those workflows.

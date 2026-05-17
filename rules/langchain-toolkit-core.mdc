@@ -1,30 +1,47 @@
 ---
 name: langchain-toolkit-core
-description: Always-on guidance for the langchain-toolkit plugin. Enforces install-check before any LangGraph/LangSmith CLI use and routes doc questions to the langchain-docs MCP.
+description: Always-on guidance for the langchain-python-devkit plugin. Enforces install-check before LangGraph CLI use and routes doc questions to the langchain-docs MCP.
 alwaysApply: true
 ---
 
-# LangChain Toolkit core rule
+# LangChain Python Development Kit core rule
 
-You have access to the `langchain-toolkit` plugin, which provides skills for
-the LangGraph and LangSmith CLIs and an MCP server for documentation lookup.
+You have access to the `langchain-python-devkit` plugin, which provides **Python-centric** skills for
+the LangGraph CLI (uv/pyproject workflows) and an MCP server for documentation lookup.
 
 ## Hard rules
 
-1. **Install-check first.** Before running any `langgraph` or `langsmith`
-   command, verify the CLI is installed using the protocol in
-   `skills/_shared/install-check.md`. If missing, surface the exact
-   `pip install` command and ask before running it. Never silently install.
+1. **Install-check first.** Before running any **`langgraph`** command,
+   follow **`skills/_shared/install-check.md`** (**Branch A** for **`langgraph-new`**,
+   **Branch B** for all other LangGraph CLI skills). If the CLI is missing, offer **`pip install "langgraph-cli[inmem]"`**
+   or **`uv tool install "langgraph-cli[inmem]"`** (or add the package in
+   projects) per that file — ask before installing. Never silently install.
 
 2. **Default values for unspecified flags.** Every skill in this plugin
    documents a default value for every flag. If the user does not specify a
    flag, use the default — do not pause to ask.
 
 3. **Doc lookups go through the MCP.** For any "how does X work" /
-   "what does flag Y do" question about LangChain, LangGraph, or LangSmith,
+   "what does flag Y do" question about LangChain, LangGraph, or the wider
+   ecosystem docs,
    call the `search_docs_by_lang_chain` tool from the `langchain-docs` MCP
    server. Do not invent answers from training-data memory; do not fall back
    to web fetching.
+
+4. **Python imports from installed packages.** When choosing or correcting a
+   LangChain Python import path (e.g. `langchain.*` vs `langchain_core.*`),
+   read the project **`pyproject.toml`** for pinned **`langchain*`** dependency
+   versions (check **`[tool.uv.sources]`** when present). Do not rely on editor
+   quick-fixes or training-data module paths alone. Follow
+   **`skills/langchain-docs-search/SKILL.md`**: call `search_docs_by_lang_chain`
+   with the **concrete symbol** (`HumanMessage`, `ChatOpenAI`, etc.) plus
+   optional version text from `pyproject.toml`; prefer API reference hits and
+   explicit `from … import …` snippets, and cite **`https://docs.langchain.com`**
+   links returned by the MCP. If semantic search is fuzzy, use
+   **`query_docs_filesystem_docs_by_lang_chain`** on the same MCP server as
+   described in that skill. **Caveat:** published docs track the current site;
+   if locally pinned versions are very old or prereleases, note the mismatch and
+   suggest aligning dependencies when behavior may differ.
 
 ## Routing table
 
@@ -35,18 +52,13 @@ the LangGraph and LangSmith CLIs and an MCP server for documentation lookup.
 | build a langgraph docker image                                 | `langgraph-build`      |
 | customize the langgraph Dockerfile                             | `langgraph-dockerfile` |
 | scaffold a new langgraph project                               | `langgraph-new`        |
-| deploy graph to LangSmith Deployment                           | `langgraph-deploy`     |
-| list tracing projects                                          | `langsmith-projects`   |
-| list / inspect traces                                          | `langsmith-traces`     |
-| list / export individual runs (LLM, tool, chain)               | `langsmith-runs`       |
-| list eval datasets                                             | `langsmith-datasets`   |
-| list / compare experiments                                     | `langsmith-experiments`|
-| list / upload / delete evaluators                              | `langsmith-evaluators` |
-| list multi-turn conversation threads                           | `langsmith-threads`    |
-| search the LangChain / LangGraph / LangSmith docs              | `langchain-docs-search`|
+| deploy graph to hosted LangGraph                               | `langgraph-deploy`     |
+| search the LangChain / LangGraph docs                          | `langchain-docs-search`|
+| resolve LangChain Python imports / module paths                | `langchain-docs-search`|
 
 ## Environment
 
-- LangSmith skills require `LANGSMITH_API_KEY` in the shell environment.
-- `langgraph up` and `langgraph deploy` additionally require Docker running
-  and a LangSmith workspace with Deployments enabled.
+- Some **`langgraph`** commands expect **`LANGSMITH_API_KEY`** (and optionally
+  **`LANGSMITH_ENDPOINT`**) in the shell — follow each skill’s steps.
+- **`langgraph up`** and **`langgraph deploy`** require Docker running when
+  those flows use Docker; confirm readiness per the relevant skill.
