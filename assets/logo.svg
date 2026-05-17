@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Background tile -->
+  <rect width="256" height="256" rx="56" fill="#0A2424"/>
+
+  <!-- Soft inner glow -->
+  <circle cx="128" cy="128" r="92" fill="#103838" opacity="0.55"/>
+
+  <!-- NA monogram — letters as hand-built geometric paths -->
+  <g fill="#5FCEB5">
+    <!-- Letter N -->
+    <rect x="48" y="72" width="22" height="112"/>
+    <rect x="94" y="72" width="22" height="112"/>
+    <polygon points="48,72 70,72 116,184 94,184"/>
+
+    <!-- Letter A -->
+    <polygon points="132,184 152,184 180,72 160,72"/>
+    <polygon points="188,184 208,184 180,72 160,72"/>
+    <rect x="150" y="132" width="40" height="14"/>
+  </g>
+</svg>

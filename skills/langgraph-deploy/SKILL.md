@@ -47,16 +47,9 @@ it before continuing — deploys typically fail without it. If **`langgraph depl
 or current docs list other required environment variables, verify presence the same way.
 Confirm their workspace plan and deployment access match what the CLI expects.
 
-## Step 4 — Project layout
+## Step 4 — Run
 
-Branch B **`install-check`** already requires **`langgraph.json`** and **`pyproject.toml`**
-at **project root**. If you are not in that layout, delegate to **`langgraph-new`**
-before **`langgraph deploy`**.
-
-## Step 5 — Run
-
-From **project root** (after Branch B **`install-check`**, including **`uv sync`** when
-needed):
+After **Step 1** (**Branch B** completes), deploy with:
 
 ```bash
 uv run langgraph deploy [resolved flags]
@@ -64,7 +57,7 @@ uv run langgraph deploy [resolved flags]
 
 Stream the build/deploy logs back to the user.
 
-## Step 6 — Show outcome and suggest next step
+## Step 5 — Show outcome and suggest next step
 
 After success, surface the deployment URL (or identifier) printed by the CLI. Recommend they
 confirm in the deployment UI that the new revision is serving, then hit the endpoint and verify

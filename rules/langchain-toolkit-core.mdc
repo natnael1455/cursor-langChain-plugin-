@@ -1,13 +1,13 @@
 ---
 name: langchain-toolkit-core
-description: Always-on guidance for the langchain-toolkit plugin. Enforces install-check before LangGraph CLI use and routes doc questions to the langchain-docs MCP.
+description: Always-on guidance for the langchain-python-devkit plugin. Enforces install-check before LangGraph CLI use and routes doc questions to the langchain-docs MCP.
 alwaysApply: true
 ---
 
-# LangChain Toolkit core rule
+# LangChain Python Development Kit core rule
 
-You have access to the `langchain-toolkit` plugin, which provides skills for
-the LangGraph CLI and an MCP server for documentation lookup.
+You have access to the `langchain-python-devkit` plugin, which provides **Python-centric** skills for
+the LangGraph CLI (uv/pyproject workflows) and an MCP server for documentation lookup.
 
 ## Hard rules
 
@@ -28,6 +28,21 @@ the LangGraph CLI and an MCP server for documentation lookup.
    server. Do not invent answers from training-data memory; do not fall back
    to web fetching.
 
+4. **Python imports from installed packages.** When choosing or correcting a
+   LangChain Python import path (e.g. `langchain.*` vs `langchain_core.*`),
+   read the project **`pyproject.toml`** for pinned **`langchain*`** dependency
+   versions (check **`[tool.uv.sources]`** when present). Do not rely on editor
+   quick-fixes or training-data module paths alone. Follow
+   **`skills/langchain-docs-search/SKILL.md`**: call `search_docs_by_lang_chain`
+   with the **concrete symbol** (`HumanMessage`, `ChatOpenAI`, etc.) plus
+   optional version text from `pyproject.toml`; prefer API reference hits and
+   explicit `from … import …` snippets, and cite **`https://docs.langchain.com`**
+   links returned by the MCP. If semantic search is fuzzy, use
+   **`query_docs_filesystem_docs_by_lang_chain`** on the same MCP server as
+   described in that skill. **Caveat:** published docs track the current site;
+   if locally pinned versions are very old or prereleases, note the mismatch and
+   suggest aligning dependencies when behavior may differ.
+
 ## Routing table
 
 | User intent                                                    | Skill                  |
@@ -39,6 +54,7 @@ the LangGraph CLI and an MCP server for documentation lookup.
 | scaffold a new langgraph project                               | `langgraph-new`        |
 | deploy graph to hosted LangGraph                               | `langgraph-deploy`     |
 | search the LangChain / LangGraph docs                          | `langchain-docs-search`|
+| resolve LangChain Python imports / module paths                | `langchain-docs-search`|
 
 ## Environment
 

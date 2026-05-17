@@ -51,8 +51,7 @@ Docker setup that provides **buildx**) before **`langgraph build`**.
 
 ## Step 4 — Run
 
-From **project root** (after Branch B **`install-check`**, including **`uv sync`** when
-needed):
+After **Step 1** (**Branch B** completes), build with:
 
 ```bash
 uv run langgraph build [resolved flags]

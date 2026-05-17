@@ -1,8 +1,8 @@
 {
-  "name": "langchain-toolkit",
-  "displayName": "LangChain Toolkit",
+  "name": "langchain-python-devkit",
+  "displayName": "LangChain Python Development Kit",
   "version": "0.1.0",
-  "description": "LangGraph CLI skills with auto install-check, plus the Docs by LangChain MCP for in-editor doc lookup.",
+  "description": "Python-centric LangChain and LangGraph kit: uv, pyproject.toml, and LangGraph CLI workflows with install-check, plus Docs by LangChain MCP—all skills assume a Python LangGraph project layout, not the JavaScript LangGraph toolchain.",
   "author": {
     "name": "Natnael Yacob Asgedom"
   },
@@ -10,18 +10,22 @@
   "keywords": [
     "langchain",
     "langgraph",
+    "python",
     "cli",
     "agents",
     "docs"
   ],
   "category": "developer-tools",
+  "logo": "assets/logo.svg",
   "skills": "./skills/",
   "mcpServers": "mcp.json",
   "commands": [
-    "commands/lg-dev.md",
-    "commands/lg-up.md",
-    "commands/lg-build.md",
-    "commands/lg-deploy.md",
-    "commands/docs.md"
+    "commands/langchain-docs-search-cmd.md",
+    "commands/langgraph-build-cmd.md",
+    "commands/langgraph-deploy-cmd.md",
+    "commands/langgraph-dev-cmd.md",
+    "commands/langgraph-dockerfile-cmd.md",
+    "commands/langgraph-new-cmd.md",
+    "commands/langgraph-up-cmd.md"
   ]
 }
