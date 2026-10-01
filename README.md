@@ -95,3 +95,19 @@ or use the slash commands below.
 | `/langgraph-up-cmd`          | `langgraph-up`           |
 
 Skills are defined in **`skills/*/SKILL.md`**; slash commands delegate to those workflows.
+
+## License
+
+Copyright © 2026 Natnael Yacob Asgedom. [MIT License](LICENSE).
+
+## Publish to Cursor Marketplace
+
+From [Submitting a plugin](https://cursor.com/docs/reference/plugins#submitting-a-plugin):
+
+1. Valid **`.cursor-plugin/plugin.json`** (and **`variables`** schema if MCP or config uses `${…}` placeholders).
+2. Public Git repository; logo committed and referenced by relative path when possible.
+3. **`README.md`** explains setup, configuration, and slash commands.
+4. Pre-submit checklist: unique kebab-case **`name`**, clear **`description`**, valid skill/rule/command frontmatter, no secrets in repo, plugin tested locally.
+5. Submit the repository URL at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
+
+Marketplace submission itself is manual after the repo is ready.
